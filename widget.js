@@ -364,18 +364,67 @@ xbmimg = {
                         hexArr.push( "0x" + hexstr.toUpperCase() );
                     }
                     
-                    var finalScript = tEl.val() + hexArr.join(", ") + "\n }"
+                    var finalScript = tEl.val();
+                    
+                    // we need to wrap a new line at each 12th comma
+                    var itemCtrForNewline = 1;
+                    for (var itemCtr = 0; itemCtr < hexArr.length; itemCtr++) {
+                        finalScript += hexArr[itemCtr] + ", ";
+                        if (itemCtrForNewline == 12) {
+                            finalScript += "\n";
+                            itemCtrForNewline = 1;
+                        } else {
+                            itemCtrForNewline++;
+                        }
+                    }
+                    // finalScript += hexArr.join(", ") 
+                    finalScript += "\n }"
                     
                     finalScript += `
 
-if file.open("img.xbm", "w") then
-  local str = string.char(unpack(xbmimg))
-  file.write(str)
-  file.close()
-  print("Done writing binary XBM img file")
-else
-  print("Could not open file for binary write of XBM img")
+xbmimgstr = string.char(unpack(xbmimg))
+
+function writeImg()
+    if file.open("img.xbm", "w") then
+      file.write(xbmimgstr)
+      file.close()
+      print("Done writing binary XBM img file")
+    else
+      print("Could not open file for binary write of XBM img")
+    end
+end 
+
+function setupDisplay()
+    id  = i2c.HW0
+    sda = 5 --16
+    scl = 4 --17
+    i2c.setup(id, sda, scl, i2c.FAST)
+    
+    sla = 0x3c
+    disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
 end
+
+function readImg()
+    file.open("img.xbm", "r")
+    xbmimgstr = file.read()
+    file.close()
+end 
+
+function sendImgToDisplay()
+    disp:clearBuffer()
+    disp:sendBuffer() 
+    
+    w = ` + w + `
+    h = ` + h + `
+    x = (128 - w) / 2
+    y = (64 - h) / 2
+    disp:drawXBM(x,y,w,h,xbmimgstr)
+    disp:sendBuffer() 
+end
+
+setupDisplay()
+sendImgToDisplay()
+
 `;
                     
                     tEl.val(finalScript);
