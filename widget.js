@@ -317,20 +317,53 @@ cpdefine("inline:com-chilipeppr-widget-xbm", ["chilipeppr_ready", /* other depen
                     for (var y = 0; y < h; y++) {
                         for (var x = 0; x < w; x++) {
                             
-                            var pixelData = canvas.getContext('2d').getImageData(x, y, 1, 1).data;
-                            // console.log("pixelData:", pixelData);
-                            // if red, green, or blue is more than 1 assume 0xff, otherwise assume 0
-                            if (pixelData[0] > 0 || pixelData[1] > 0 || pixelData[2] > 0 ) {
+                            var imgCtx = canvas.getContext('2d');
+                            var img2dData = canvas.getContext('2d').getImageData(x, y, 1, 1);
+                            var pixelData = img2dData.data;
+                            // console.log("pixelData:", pixelData, "img2dData:", img2dData);
+                            
+                            // create new array to store pixel info
+                            // img2dData.data = [];
+                            
+                            // if red, green, or blue is more than 128 assume 0xff, otherwise assume 0
+                            // this is essentially a 50% threshold
+                            if (pixelData[0] > 128 || pixelData[1] > 128 || pixelData[2] > 128 ) {
+                                
+                                // we are forcing this pixel to white
                                 // hexStr += ", 0xff";
                                 bit = "0" + bit; // set 0,0 to lowest bit
                                 // hexArr.push("0xff");
                                 pxWhtCnt++;
+                                
+                                // now force pixelData into our 50% threshold choice of black or white
+                                // img2dData.data[0] = 255;
+                                // img2dData.data[1] = 255;
+                                // img2dData.data[2] = 255;
+                                // img2dData.data[3] = 255;
+                                // canvas.getContext('2d').putImageData(img2dData, x, y);
+                                
+                                imgCtx.fillStyle = "white";    // this is default anyway
+                                imgCtx.fillRect(x, y, 1, 1);
+                                
                             } else {
+                                
+                                // we are forcing this pixel to black
                                 bit = "1" + bit;
-                                // hexStr += ", 0xff";
+                                // hexStr += ", 0x00";
                                 // hexArr.push("0x00");
                                 pxBlkCnt++;
+                                
+                                // now force pixelData into our 50% threshold choice of black or white
+                                // img2dData.data[0] = 0;
+                                // img2dData.data[1] = 0;
+                                // img2dData.data[2] = 0;
+                                // img2dData.data[3] = 255;
+                                // canvas.getContext('2d').putImageData(img2dData, x, y);
+                                imgCtx.fillStyle = "black";    // this is default anyway
+                                imgCtx.fillRect(x, y, 1, 1);
                             }
+                            
+                            // console.log("img2dData after:", img2dData);
                             
                             if (cnt == 8) {
                                 // we have our first full byte
@@ -360,6 +393,10 @@ cpdefine("inline:com-chilipeppr-widget-xbm", ["chilipeppr_ready", /* other depen
                             bit = ""; // reset bit array to empty
                         }
                     }
+                    
+                    // reset the background img of editor-box to the newly modified image
+                    var newDataURL = canvas.toDataURL();
+                    $("div#editor-box").css({backgroundImage: "url(" + newDataURL + ")"});
                     
                     // imgData
                     console.log("pxArr:", pxArr);
