@@ -34,7 +34,7 @@ requirejs.config({
     }
 });
 
-cprequire_test(["inline:com-chilipeppr-widget-template"], function(myWidget) {
+cprequire_test(["inline:com-chilipeppr-widget-xbm"], function(myWidget) {
 
     // Test this element. This code is auto-removed by the chilipeppr.load()
     // when using this widget in production. So use the cpquire_test to do things
@@ -74,14 +74,14 @@ cprequire_test(["inline:com-chilipeppr-widget-template"], function(myWidget) {
 } /*end_test*/ );
 
 // This is the main definition of your widget. Give it a unique name.
-cpdefine("inline:com-chilipeppr-widget-template", ["chilipeppr_ready", /* other dependencies here */ ], function() {
+cpdefine("inline:com-chilipeppr-widget-xbm", ["chilipeppr_ready", /* other dependencies here */ ], function() {
     return {
         /**
          * The ID of the widget. You must define this and make it unique.
          */
-        id: "com-chilipeppr-widget-template", // Make the id the same as the cpdefine id
-        name: "Widget / Template", // The descriptive name of your widget.
-        desc: "This example widget gives you a framework for creating your own widget. Please change this description once you fork this template and create your own widget. Make sure to run runme.js every time you are done editing your code so you can regenerate your README.md file, regenerate your auto-generated-widget.html, and automatically push your changes to Github.", // A description of what your widget does
+        id: "com-chilipeppr-widget-xbm", // Make the id the same as the cpdefine id
+        name: "Widget / XBM", // The descriptive name of your widget.
+        desc: "This widget helps you create and upload XBM image files to your ESP32, ESP8266, or other Lua devices.", // A description of what your widget does
         url: "(auto fill by runme.js)",       // The final URL of the working widget as a single HTML file with CSS and Javascript inlined. You can let runme.js auto fill this if you are using Cloud9.
         fiddleurl: "(auto fill by runme.js)", // The edit URL. This can be auto-filled by runme.js in Cloud9 if you'd like, or just define it on your own to help people know where they can edit/fork your widget
         githuburl: "(auto fill by runme.js)", // The backing github repo
@@ -97,7 +97,7 @@ cpdefine("inline:com-chilipeppr-widget-template", ["chilipeppr_ready", /* other 
          */
         publish: {
             // Define a key:value pair here as strings to document what signals you publish.
-            '/onExampleGenerate': 'Example: Publish this signal when we go to generate gcode.'
+            // '/onExampleGenerate': 'Example: Publish this signal when we go to generate gcode.'
         },
         /**
          * Define the subscribe signals that this widget/element owns or defines so that
@@ -132,12 +132,301 @@ cpdefine("inline:com-chilipeppr-widget-template", ["chilipeppr_ready", /* other 
          */
         init: function() {
             console.log("I am being initted. Thanks.");
-
+            
+            this.pasteSetup();
+            this.setupCreateScriptBtn();
+            
             this.setupUiFromLocalStorage();
             this.btnSetup();
             this.forkSetup();
 
             console.log("I am done being initted.");
+        },
+        setupCreateScriptBtn: function() {
+            $('#' + this.id + ' .btn-genscript').click(this.onCreateScript.bind(this));
+        },
+        scriptCtr: 1,
+        onCreateScript: function() {
+            console.log("onCreateScript. ");
+            
+            if (this.xbmScript.length == 0) {
+                alert("You have not pasted in an image yet, thus no script exists to send to the Lua editor.");
+                return;
+            }
+            // remove cr/lf if they exist
+            // content = content.replace(/\r\n/g, "\n");
+            
+            var obj = {
+                name: "xbmimage" + this.scriptCtr + ".lua",
+                content: this.xbmScript
+            }
+            chilipeppr.publish("/com-chilipeppr-widget-luaeditor/loadScript", obj);
+            this.scriptCtr++;
+        },
+        imgData: [],
+        xbmScript: "",
+        pasteSetup: function() {
+            
+            var mythat = this;
+            
+            // Created by STRd6
+            // MIT License
+            // jquery.paste_image_reader.js
+            (function ($) {
+              var defaults;
+              $.event.fix = (function (originalFix) {
+                  return function (event) {
+                      event = originalFix.apply(this, arguments);
+                      if (event.type.indexOf('copy') === 0 || event.type.indexOf('paste') === 0) {
+                          event.clipboardData = event.originalEvent.clipboardData;
+                      }
+                      return event;
+                  };
+              })($.event.fix);
+              defaults = {
+                  callback: $.noop,
+                  matchType: /image.*/
+              };
+              return $.fn.pasteImageReader = function (options) {
+                  if (typeof options === "function") {
+                      options = {
+                          callback: options
+                      };
+                  }
+                  options = $.extend({}, defaults, options);
+                  return this.each(function () {
+                      var $this, element;
+                      element = this;
+                      $this = $(this);
+                      return $this.bind('paste', function (event) {
+                          var clipboardData, found;
+                          found = false;
+                          clipboardData = event.clipboardData;
+                          return Array.prototype.forEach.call(clipboardData.types, function (type, i) {
+                              var file, reader;
+                              if (found) {
+                                  return;
+                              }
+                              if (type.match(options.matchType) || clipboardData.items[i].type.match(options.matchType)) {
+                                  file = clipboardData.items[i].getAsFile();
+                                  reader = new FileReader();
+                                  reader.onload = function (evt) {
+                                      return options.callback.call(element, {
+                                          dataURL: evt.target.result,
+                                          event: evt,
+                                          file: file,
+                                          name: file.name
+                                      });
+                                  };
+                                  reader.readAsDataURL(file);
+                                  //snapshoot();
+                                  return found = true;
+                              }
+                              // if we get here, something wrong happened
+                              setTimeout(function() {
+                                  $("div#editor-box")
+                                    .html('<span style="color:red">Error. You can only paste images.</span>');
+                              }, 200);
+                            //   backgroundImage
+                          });
+                      });
+                  });
+              };
+            })(jQuery);
+            
+            
+            $("html").pasteImageReader(function (results) {
+                
+                console.log("inside pasteImageReader. results:", results);
+
+                  var dataURL, filename;
+                  filename = results.filename, dataURL = results.dataURL;
+                  $data.text(dataURL);
+                  $size.val(results.file.size);
+                  $type.val(results.file.type);
+                  $test.attr('href', dataURL);
+                  var img = document.createElement('img');
+                  img.src = dataURL;
+                  
+                  // it seems that it takes a bit of time for the image to render
+                  // so we don't get back a good width/height. so do this later to give time for image
+                  // to load
+                  setTimeout(function() {
+
+                    var w = img.width;
+                    var h = img.height;
+                    console.log("width:", w, "height:", h);
+                    if (w > 0 && h > 0) {
+                    // good to go
+                    } else {
+                    alert("problem with width height. w:" + w + ", h:", h);
+                    }
+                    $width.val(w); $height.val(h);
+                    $("div#editor-box").height(h).text("").css({
+                    backgroundImage: "url(" + dataURL + ")"
+                    }).data({ 'width': w, 'height': h });
+                    $(".editor-box-note").addClass("hidden");
+                    
+                    // set the width/height in info boxes
+                    $('.widget-xbm-img-w').text(w);
+                    $('.widget-xbm-img-h').text(h);
+                    
+                    // get textaarea
+                    var tEl = $('.widget-xbm-arraydata');
+                    tEl.removeClass("hidden");
+                    tEl.val(`-- #define img_width ` + w + `
+-- #define img_height ` + h + `
+-- static char img_bits[] = {
+xbmimg = {
+`);
+                    
+                    // var img = document.getElementById('my-image');
+                    var canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+                    
+                    var hexStr = "";
+                    var hexArr = [];
+                    var pxWhtCnt = 0;
+                    var pxBlkCnt = 0;
+                    
+                    // we can generate a bit for every pixel, but since xbm wants 0xff or 8bits
+                    // per value, we need to iterate every 8th 0 or 1 to generate our 0xff val
+                    /*
+                    a single bit represents each pixel (0 for white or 1 for black), each byte in 
+                    the array contains the information for eight pixels, with the upper left pixel 
+                    in the bitmap represented by the low bit of the first byte in the array. If the 
+                    image width does not match a multiple of 8, the extra bits in the last byte of 
+                    each row are ignored.
+                    
+                    each row has to be a multiple of 8. if it's not, then add more bits to last byte
+                    to pad
+                    */
+                    var pxArr = [];
+                    var cnt = 1;
+                    var bit = "";
+                    for (var y = 0; y < h; y++) {
+                        for (var x = 0; x < w; x++) {
+                            
+                            var pixelData = canvas.getContext('2d').getImageData(x, y, 1, 1).data;
+                            // console.log("pixelData:", pixelData);
+                            // if red, green, or blue is more than 1 assume 0xff, otherwise assume 0
+                            if (pixelData[0] > 0 || pixelData[1] > 0 || pixelData[2] > 0 ) {
+                                // hexStr += ", 0xff";
+                                bit = "0" + bit; // set 0,0 to lowest bit
+                                // hexArr.push("0xff");
+                                pxWhtCnt++;
+                            } else {
+                                bit = "1" + bit;
+                                // hexStr += ", 0xff";
+                                // hexArr.push("0x00");
+                                pxBlkCnt++;
+                            }
+                            
+                            if (cnt == 8) {
+                                // we have our first full byte
+                                // push bit string onto array
+                                pxArr.push(bit);
+                                cnt = 1;
+                                bit = ""; // reset bit array to empty
+                            } else {
+                                // increment counter
+                                cnt++;
+                            }
+                        }
+                        
+                        // just push the bits onto array to be done with it
+                        if (bit != "") {
+                            // we have to some bits to deal with
+                            // pad bits if length less than 8
+                            if (bit.length < 8) {
+                                // we need to pad start of string
+                                for (var padCtr = bit.length; padCtr < 8; padCtr++) {
+                                    bit = "0" + bit;
+                                }
+                                
+                            }
+                            pxArr.push(bit);
+                            cnt = 1;
+                            bit = ""; // reset bit array to empty
+                        }
+                    }
+                    
+                    // imgData
+                    console.log("pxArr:", pxArr);
+                    
+                    // create hex arr
+                    for (var pxToHexCtr = 0; pxToHexCtr < pxArr.length; pxToHexCtr++) {
+                        var len = 2;
+                        var str = parseInt(pxArr[pxToHexCtr], 2).toString(16);
+                        var hexstr = "0".repeat(len - str.length) + str;
+                        hexArr.push( "0x" + hexstr.toUpperCase() );
+                    }
+                    
+                    var finalScript = tEl.val() + hexArr.join(", ") + "\n }"
+                    
+                    finalScript += `
+
+if file.open("img.xbm", "w") then
+  local str = string.char(unpack(xbmimg))
+  file.write(str)
+  file.close()
+  print("Done writing binary XBM img file")
+else
+  print("Could not open file for binary write of XBM img")
+end
+`;
+                    
+                    tEl.val(finalScript);
+                    mythat.xbmScript = finalScript;
+                    $('.widget-xbm-img-wht').text(pxWhtCnt);
+                    $('.widget-xbm-img-blk').text(pxBlkCnt);
+                    
+                  }, 500);
+                  
+                  // double the height
+                //   $("div#editor-box").height($("div#editor-box").height() * 2);
+                  
+                //   console.log("about to return from pasteImageReader. img:", img);
+                //   return $(".active").css({
+                //       backgroundImage: "url(" + dataURL + ")"
+                //   }).data({ 'width': w, 'height': h });
+              });
+            
+              var $data, $size, $type, $test, $width, $height;
+              $(function () {
+                  $data = $('.data');
+                  $size = $('.size');
+                  $type = $('.type');
+                  $test = $('#test');
+                  $width = $('#width');
+                  $height = $('#height');
+                  
+                  // disabling on click. not sure what value it adds.
+                  $('.target').on('click2', function () {
+                      console.log("on click evt for target");
+                      
+                      var $this = $(this);
+                      var bi = $this.css('background-image');
+                      if (bi != 'none') {
+                          $data.text(bi.substr(4, bi.length - 6));
+                      }
+            
+                      $('.active').removeClass('active');
+                      $this.addClass('active');
+            
+                      $this.toggleClass('contain');
+            
+                      $width.val($this.data('width'));
+                      $height.val($this.data('height'));
+                      if ($this.hasClass('contain')) {
+                          $this.css({ 'width': $this.data('width'), 'height': $this.data('height'), 'z-index': '10' });
+                      } else {
+                          $this.css({ 'width': '', 'height': '', 'z-index': '' });
+                      }
+                  });
+              });    
         },
         /**
          * Call this method from init to setup all the buttons when this widget
