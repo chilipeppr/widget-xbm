@@ -243,6 +243,8 @@ cpdefine("inline:com-chilipeppr-widget-xbm", ["chilipeppr_ready", /* other depen
                       element = this;
                       $this = $(this);
                       return $this.bind('paste', function (event) {
+                          $("div#editor-box")
+                                    .html('<span style="color:blue">Creating image...</span>');
                           var clipboardData, found;
                           found = false;
                           clipboardData = event.clipboardData;
@@ -319,10 +321,9 @@ cpdefine("inline:com-chilipeppr-widget-xbm", ["chilipeppr_ready", /* other depen
                     var tEl = $('.widget-xbm-arraydata');
                     tEl.removeClass("hidden");
                     tEl.val(`-- #define img_width ` + w + `
--- #define img_height ` + h + `
--- static char img_bits[] = {
-xbmimg = {
-`);
+-- #define img_height ` + h + '\n'
+// -- static char img_bits[] = {
+);
                     
                     // var img = document.getElementById('my-image');
                     var canvas = document.createElement('canvas');
@@ -410,7 +411,9 @@ xbmimg = {
                     
                     var finalScript = tEl.val();
                     
+                    
                     // we need to wrap a new line at each 12th comma
+                    finalScript += 'xbmimg = {\n'
                     var itemCtrForNewline = 1;
                     for (var itemCtr = 0; itemCtr < hexArr.length; itemCtr++) {
                         finalScript += hexArr[itemCtr] + ", ";
@@ -424,6 +427,14 @@ xbmimg = {
                     // finalScript += hexArr.join(", ") 
                     finalScript += "\n }"
                     
+                    /*
+                    // use approach more like lua
+                    finalScript += 'xbmimg = {}    -- new array\n'
+                    for (var i = 0; i < hexArr.length; i++) {
+                        finalScript += 'xbmimg[' + i + '] = ' + hexArr[i] + '\n';
+                    }
+                    */
+                    
                     finalScript += `
 
 xbmimgstr = string.char(unpack(xbmimg))
@@ -436,6 +447,12 @@ function writeImg()
     else
       print("Could not open file for binary write of XBM img")
     end
+end 
+
+function readImg()
+    file.open("img.xbm", "r")
+    xbmimgstr = file.read()
+    file.close()
 end 
 
 function setupDisplay()
@@ -452,12 +469,6 @@ function setupDisplay()
     disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
 end
 
-function readImg()
-    file.open("img.xbm", "r")
-    xbmimgstr = file.read()
-    file.close()
-end 
-
 function sendImgToDisplay()
     disp:clearBuffer()
     disp:sendBuffer() 
@@ -470,6 +481,8 @@ function sendImgToDisplay()
     disp:sendBuffer() 
 end
 
+-- writeImg()
+-- readImg()
 setupDisplay()
 sendImgToDisplay()
 
@@ -480,7 +493,7 @@ sendImgToDisplay()
                     $('.widget-xbm-img-wht').text(pxWhtCnt);
                     $('.widget-xbm-img-blk').text(pxBlkCnt);
                     
-                  }, 500);
+                  }, 2000);
                   
                   // double the height
                 //   $("div#editor-box").height($("div#editor-box").height() * 2);
