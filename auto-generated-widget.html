@@ -439,6 +439,10 @@ function writeImg()
 end 
 
 function setupDisplay()
+
+    -- only setup display if disp not created yet
+    if disp ~= nil then return end
+
     id  = i2c.HW0
     sda = 5 --16
     scl = 4 --17
