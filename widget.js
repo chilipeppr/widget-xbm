@@ -199,6 +199,13 @@ cpdefine("inline:com-chilipeppr-widget-xbm", ["chilipeppr_ready", /* other depen
                       element = this;
                       $this = $(this);
                       return $this.bind('paste', function (event) {
+                          console.log("event:", event);
+                          // Does the element have focus:
+                          var hasFocus = $("div#editor-box").is(':focus');
+                          console.log("is editor box active?", hasFocus);
+                          if (!hasFocus) {
+                              return;
+                          }
                           $("div#editor-box")
                                     .html('<span style="color:blue">Creating image...</span>');
                           var clipboardData, found;
