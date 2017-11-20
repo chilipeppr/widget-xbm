@@ -418,7 +418,25 @@ sendImgToDisplay()
                     var h = img.height;
                     console.log("width:", w, "height:", h);
                     if (w > 0 && h > 0) {
-                    // good to go
+                        // good to go
+                        
+                        // but check for oversized images too cuz it kills this thing
+                        if (w > 128 || h > 128) {
+                            var r = confirm("Your image is overly large with width: " + w + 
+                            "px and height: " + h + 
+                            "px and will likely freeze up the XBM image creation. I suggest you cancel. Do you really want to continue?");
+                            if (r == true) {
+                                // txt = "You pressed OK!";
+                                
+                            } else {
+                                // txt = "You pressed Cancel!";
+                                console.log("User cancelled");
+                                $("div#editor-box")
+                                    .html('Cancelled image paste.');
+                                return;
+                            }    
+                        }
+                        
                     } else {
                     alert("problem with width height. w:" + w + ", h:", h);
                     }
