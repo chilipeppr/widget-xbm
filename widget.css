@@ -21,3 +21,10 @@
     background-position: center;
     background-size: contain;
 }
+
+#com-chilipeppr-widget-xbm.hover {
+    border: 3px blue dashed;
+}
+.widget-xbm-img-preview {
+    border: 1px dashed green;
+}

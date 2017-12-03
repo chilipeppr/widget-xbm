@@ -42,11 +42,11 @@
                     <!--data-container="body" data-trigger="hover" data-title="Say Hello" -->
                     <!--data-content="Upload image as XBM binary file to device">Upload-->
                     <!--</button>-->
-                    <button type="button" class="btn btn-xs btn-default btn-genscript" 
-                    data-delay="1000" data-animation="true" data-placement="auto" 
-                    data-container="body" data-trigger="hover" data-title="Generate a Lua script" 
-                    data-content="Generate a script into the Lua editor that you can run to upload your XBM image file"><span class="glyphicon glyphicon-edit"></span> Gen Script
-                    </button>
+                    <!--<button type="button" class="btn btn-xs btn-default btn-genscript" -->
+                    <!--data-delay="1000" data-animation="true" data-placement="auto" -->
+                    <!--data-container="body" data-trigger="hover" data-title="Generate a Lua script" -->
+                    <!--data-content="Generate a script into the Lua editor that you can run to upload your XBM image file"><span class="glyphicon glyphicon-edit"></span>-->
+                    <!--</button>-->
                     <button type="button" class="btn btn-xs btn-default btn-genscript-cplogo" 
                     data-delay="1000" data-animation="true" data-placement="auto" 
                     data-container="body" data-trigger="hover" data-title="Generate ChiliPeppr Logo script" 
@@ -64,7 +64,7 @@
                         <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
                     </div>
                 </div>
-            </div> <span class="panel-title" data-toggle="popover">XBM Image</span> <span style="font-size:9px;" class="fb-build">v3</span>
+            </div> <span class="panel-title" data-toggle="popover">XBM Image / GIF Animation</span> <span style="font-size:9px;" class="fb-build">v3</span>
 
         </div>
         <div class="panel-body">
@@ -82,20 +82,46 @@
                     <td style="background: #eeeeee;">Black pixels</td>
                     <td class="widget-xbm-img-blk">-</td>
                 </tr>
+                <tr class="widget-xbm-anim hidden">
+                    <td style="background: #eeeeee;">Frames</td>
+                    <td class="widget-xbm-anim-frameCnt">-</td>
+                    <td style="background: #eeeeee;"></td>
+                    <td class=""></td>
+                </tr>
             </table>
 
             <p class="editor-box-note" style="padding-top:10px;">Note: Paste image from 
             clipboard in box below to generate 
-            XBM image. A 50% threshold algorithm will be used to create a monochrome image.
-            Then click "Generate Script" button above.
+            XBM image. Or drag/drop an animated GIF file. A 50% threshold algorithm will be used to create a monochrome image.
+            <!--Then click "Generate Script" button above.-->
             <a href="https://www.youtube.com/watch?v=8WpFFtA-oMQ" target="_blank">Demo on Youtube</a>
             </p>
-            <!--<button class="btn btn-xs btn-default btn-uploadscreenshot" -->
-            <!--style="margin-bottom:5px;">Upload Screenshot</button>-->
+            
+            <div class="widget-xbm-errmsg alert alert-danger hidden" style="margin-bottom:6px;">This is the error message.</div>
+
+            <div class="widget-xbm-anim hidden" style="font-size:11px;margin-top:6px;">For transparent pixels, your composite frame (the top image) may come out looking wrong. If so drag 
+            in an animated GIF without any transparent pixels.</div>
+            
+            <div class="widget-xbm-anim btn-group hidden" style="padding:6px 0px;">
+                <!--<button class="btn btn-xs btn-default widget-xbm-rewind"><span class="glyphicon glyphicon-fast-backward"></span></button>-->
+                <!--<button class="btn btn-xs btn-default widget-xbm-stepback"><span class="glyphicon glyphicon-step-backward"></span></button>-->
+                <button class="btn btn-xs btn-default widget-xbm-playpause" disabled><span class="glyphicon glyphicon-play"></span></button>
+                <!--<button class="btn btn-xs btn-default widget-xbm-stepfwd"><span class="glyphicon glyphicon-step-forward"></span></button>-->
+                <!--<button class="btn btn-xs btn-default widget-xbm-fastfwd"><span class="glyphicon glyphicon-fast-forward"></span></button>-->
+                <span style="padding-left:6px;">Frame: </span><span class="widget-xbm-anim-frame">0</span>
+            </div>
+            
             <div id="editor-box" class="target" contenteditable="true">
                 <span style="color:silver;">Click here and paste from clipboard</span>
             </div>
-            <textarea class="form-control hidden widget-xbm-arraydata" rows="2"></textarea>
+            <textarea class="form-control hidden widget-xbm-arraydata" rows="4"></textarea>
+            <div class="widget-xbm-anim hidden">
+                Animated GIF Library
+                <textarea class="form-control widget-xbm-animplaylib" rows="4"></textarea>
+                Animated GIF Sample Play
+                <textarea class="form-control widget-xbm-animplaysample" rows="4"></textarea>
+            </div>
+            <!--<textarea class="form-control widget-xbm-anim hidden widget-xbm-arraydata" rows="4"></textarea>-->
             
             <!-- Nav tabs -->
             <!--<ul class="nav nav-tabs" role="tablist">-->

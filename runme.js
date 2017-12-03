@@ -249,7 +249,7 @@ var evalWidgetJs = function() {
   // rewrite the javascript
   //fs.writeFileSync('widget.js', widgetSrc);
   
-  eval(widgetSrc);
+  eval("window = {}; \n" + widgetSrc);
   //console.log("evaled the widget.js");
   //isEvaled = true;
   
