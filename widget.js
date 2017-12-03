@@ -810,7 +810,7 @@ anim.play()
                             tEl.val(tEl.val() + `
 print("Done creating XBM animated gif file ` + fileList.img + `")
 for i,v in ipairs(frames) do 
-print("Frame:", i, "Start:", frames[i].s, "End:", frames[i].f)
+  print("Frame:", i, "Start:", frames[i].s, "End:", frames[i].f)
 end
 `);
               
@@ -968,7 +968,7 @@ end
         }
       }
       // finalScript += hexArr.join(", ") 
-      finalScript += " })\n";
+      // finalScript += " })\n";
       
       finalScript += `startByteCnt = lastEndByteCnt + 1
 endByteCnt = lastEndByteCnt + #xbmimg
