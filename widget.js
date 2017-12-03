@@ -581,7 +581,7 @@ m.width = ##width##
 m.height = ##height##
 m.filename = "` + fileList.img + `"
 m.frameCnt = ` + animGif.frames.length + `
-m.frameSize = (m.width * m.height) / 8  -- size in bytes of each frame
+m.frameSize = ##hexItemCnt##  -- size in bytes of each frame
 m.frameDurationMs = {` + durationArrStr + `}
 
 m.disp = nil -- holds display
@@ -781,7 +781,11 @@ anim.play()
                               innerImg.src = imgRef.currentTarget.src;
                               
                               // generate some lua code
-                              tEl.val(tEl.val() + "\n\n" + that.generateXbmImageHexArrayFromCanvas(canvas));
+                              var ret = that.generateXbmImageHexArrayFromCanvas(canvas);
+                              tEl.val(tEl.val() + "\n\n" + ret.script);
+                              
+                              // we now know the hexItemCnt so swap it in
+                              tLibEl.val(tLibEl.val().replace(/##hexItemCnt##/, ret.hexItemCnt));
                               
                               cnt++;
                               resolve(cnt); // Yay! Everything went well!
@@ -952,6 +956,7 @@ end
       // we need to wrap a new line at each 12th comma
       finalScript += 'xbmimg = {}\n'
       var itemCtrForNewline = 1;
+      var hexItemCnt = 0;
       for (var itemCtr = 0; itemCtr < hexArr.length; itemCtr++) {
         
         if (itemCtrForNewline == 1) {
@@ -959,6 +964,7 @@ end
         }
         
         finalScript += hexArr[itemCtr] + ", ";
+        hexItemCnt++;
         
         if (itemCtrForNewline == 12) {
             finalScript += "})\n";
@@ -968,7 +974,15 @@ end
         }
       }
       // finalScript += hexArr.join(", ") 
-      // finalScript += " })\n";
+      if (itemCtrForNewline != 1) {
+        finalScript += "})\n";
+      }
+      
+      finalScript += "-- hexItemCnt: " + hexArr.length + "\n";
+      
+      if (hexItemCnt != hexArr.length) {
+        console.error("hexItemCnt does not match. hexItemCnt:", hexItemCnt, "hexArr.length:", hexArr.length);
+      }
       
       finalScript += `startByteCnt = lastEndByteCnt + 1
 endByteCnt = lastEndByteCnt + #xbmimg
@@ -977,7 +991,7 @@ frameCnt = frameCnt + 1
 lastEndByteCnt = endByteCnt
 appendImg()
 `;
-      return finalScript;
+      return {script:finalScript, hexItemCnt:hexArr.length};
     },
     /**
      * Pass in {filename: "asdf.gif", dataURL: (url blob)}
