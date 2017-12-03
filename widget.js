@@ -520,16 +520,16 @@ cpdefine("inline:com-chilipeppr-widget-xbm", ["chilipeppr_ready", /* other depen
 -- This method writes the xbmimg hex array to the file
 function appendImg()
 
--- open file in append+ mode, preserve data, write to end  
-local filename = "` + fileList.img + `"
-if file.open(filename, "a+") then
-local xbmimgstr = string.char(unpack(xbmimg))
-file.write(xbmimgstr)
-file.close()
-print("Done appending binary XBM img to file:", filename)
-else
-print("Could not open file for binary write of XBM img. file:", filename)
-end
+  -- open file in append+ mode, preserve data, write to end  
+  local filename = "` + fileList.img + `"
+  if file.open(filename, "a+") then
+    local xbmimgstr = string.char(unpack(xbmimg))
+    file.write(xbmimgstr)
+    file.close()
+    print("Done appending binary XBM img to file:", filename)
+  else
+    print("Could not open file for binary write of XBM img. file:", filename)
+  end
 
 end 
 
@@ -541,9 +541,9 @@ lastEndByteCnt = 0
 frameCnt = 1
 
 function xbmConcat(t2)
-for i=1, #t2 do
-  xbmimg[#xbmimg+1] = t2[i]
-end
+  for i=1, #t2 do
+    xbmimg[#xbmimg+1] = t2[i]
+  end
 end
 `);
 
@@ -1216,45 +1216,45 @@ appendImg()
 xbmimgstr = string.char(unpack(xbmimg))
 
 function writeImg()
-if file.open("img.xbm", "w") then
-file.write(xbmimgstr)
-file.close()
-print("Done writing binary XBM img file")
-else
-print("Could not open file for binary write of XBM img")
-end
+  if file.open("img.xbm", "w") then
+    file.write(xbmimgstr)
+    file.close()
+    print("Done writing binary XBM img file")
+  else
+    print("Could not open file for binary write of XBM img")
+  end
 end 
 
 function readImg()
-file.open("img.xbm", "r")
-xbmimgstr = file.read()
-file.close()
+  file.open("img.xbm", "r")
+  xbmimgstr = file.read()
+  file.close()
 end 
 
 function setupDisplay()
 
--- only setup display if disp not created yet
-if disp ~= nil then return end
-
-id  = i2c.HW0
-sda = 5 --16
-scl = 4 --17
-i2c.setup(id, sda, scl, i2c.FAST)
-
-sla = 0x3c
-disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
+  -- only setup display if disp not created yet
+  if disp ~= nil then return end
+  
+  id  = i2c.HW0
+  sda = 5 --16
+  scl = 4 --17
+  i2c.setup(id, sda, scl, i2c.FAST)
+  
+  sla = 0x3c
+  disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
 end
-
+  
 function sendImgToDisplay()
-disp:clearBuffer()
-disp:sendBuffer() 
-
-w = ` + w + `
-h = ` + h + `
-x = (128 - w) / 2
-y = (64 - h) / 2
-disp:drawXBM(x,y,w,h,xbmimgstr)
-disp:sendBuffer() 
+  disp:clearBuffer()
+  disp:sendBuffer() 
+  
+  w = ` + w + `
+  h = ` + h + `
+  x = (128 - w) / 2
+  y = (64 - h) / 2
+  disp:drawXBM(x,y,w,h,xbmimgstr)
+  disp:sendBuffer() 
 end
 
 -- writeImg()
@@ -1482,45 +1482,45 @@ xbmimg = {
 xbmimgstr = string.char(unpack(xbmimg))
 
 function writeImg()
-if file.open("img.xbm", "w") then
-  file.write(xbmimgstr)
-  file.close()
-  print("Done writing binary XBM img file")
-else
-  print("Could not open file for binary write of XBM img")
-end
+  if file.open("img.xbm", "w") then
+    file.write(xbmimgstr)
+    file.close()
+    print("Done writing binary XBM img file")
+  else
+    print("Could not open file for binary write of XBM img")
+  end
 end 
 
 function readImg()
-file.open("img.xbm", "r")
-xbmimgstr = file.read()
-file.close()
+  file.open("img.xbm", "r")
+  xbmimgstr = file.read()
+  file.close()
 end 
 
 function setupDisplay()
 
--- only setup display if disp not created yet
-if disp ~= nil then return end
-
-id  = i2c.HW0
-sda = 5 --16
-scl = 4 --17
-i2c.setup(id, sda, scl, i2c.FAST)
-
-sla = 0x3c
-disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
+  -- only setup display if disp not created yet
+  if disp ~= nil then return end
+  
+  id  = i2c.HW0
+  sda = 5 --16
+  scl = 4 --17
+  i2c.setup(id, sda, scl, i2c.FAST)
+  
+  sla = 0x3c
+  disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
 end
 
 function sendImgToDisplay()
-disp:clearBuffer()
-disp:sendBuffer() 
-
-w = 123
-h = 64
-x = (128 - w) / 2
-y = (64 - h) / 2
-disp:drawXBM(x,y,w,h,xbmimgstr)
-disp:sendBuffer() 
+  disp:clearBuffer()
+  disp:sendBuffer() 
+  
+  w = 123
+  h = 64
+  x = (128 - w) / 2
+  y = (64 - h) / 2
+  disp:drawXBM(x,y,w,h,xbmimgstr)
+  disp:sendBuffer() 
 end
 
 -- writeImg()
@@ -1860,45 +1860,45 @@ sendImgToDisplay()
 xbmimgstr = string.char(unpack(xbmimg))
 
 function writeImg()
-if file.open("img.xbm", "w") then
-  file.write(xbmimgstr)
-  file.close()
-  print("Done writing binary XBM img file")
-else
-  print("Could not open file for binary write of XBM img")
-end
+  if file.open("img.xbm", "w") then
+    file.write(xbmimgstr)
+    file.close()
+    print("Done writing binary XBM img file")
+  else
+    print("Could not open file for binary write of XBM img")
+  end
 end 
 
 function readImg()
-file.open("img.xbm", "r")
-xbmimgstr = file.read()
-file.close()
+  file.open("img.xbm", "r")
+  xbmimgstr = file.read()
+  file.close()
 end 
 
 function setupDisplay()
 
--- only setup display if disp not created yet
-if disp ~= nil then return end
-
-id  = i2c.HW0
-sda = 5 --16
-scl = 4 --17
-i2c.setup(id, sda, scl, i2c.FAST)
-
-sla = 0x3c
-disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
+  -- only setup display if disp not created yet
+  if disp ~= nil then return end
+  
+  id  = i2c.HW0
+  sda = 5 --16
+  scl = 4 --17
+  i2c.setup(id, sda, scl, i2c.FAST)
+  
+  sla = 0x3c
+  disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
 end
 
 function sendImgToDisplay()
-disp:clearBuffer()
-disp:sendBuffer() 
-
-w = ` + w + `
-h = ` + h + `
-x = (128 - w) / 2
-y = (64 - h) / 2
-disp:drawXBM(x,y,w,h,xbmimgstr)
-disp:sendBuffer() 
+  disp:clearBuffer()
+  disp:sendBuffer() 
+  
+  w = ` + w + `
+  h = ` + h + `
+  x = (128 - w) / 2
+  y = (64 - h) / 2
+  disp:drawXBM(x,y,w,h,xbmimgstr)
+  disp:sendBuffer() 
 end
 
 -- writeImg()
