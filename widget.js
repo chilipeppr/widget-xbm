@@ -588,94 +588,94 @@ m.disp = nil -- holds display
 m.isInitted = false 
 
 function m.init()
-if m.isInitted then return end 
-m.setupDisplay()
-m.isInitted = true
+  if m.isInitted then return end 
+  m.setupDisplay()
+  m.isInitted = true
 end 
 
 m.nextFrame = 1 -- Lua indexes start at 1 
 function m.play()
-m.init()
--- Play the animation
-m.tmr = tmr.create()
-if not m.tmr then
-print("Could not start timer for animation")
-return
-end
-
-print("Playing animated GIF. Width:", m.width, "Height:", m.height, "Frames:", m.frameCnt, "FrameSize (bytes):", m.frameSize)
--- Start at beginning of animation
-m.nextFrame = 1 -- Lua indexes start at 1 
-m.playFrame()
+  m.init()
+  -- Play the animation
+  m.tmr = tmr.create()
+  if not m.tmr then
+    print("Could not start timer for animation")
+    return
+  end
+  
+  print("Playing animated GIF. Width:", m.width, "Height:", m.height, "Frames:", m.frameCnt, "FrameSize (bytes):", m.frameSize)
+  -- Start at beginning of animation
+  m.nextFrame = 1 -- Lua indexes start at 1 
+  m.playFrame()
 
 end
 
 -- Will show current frame and then set timer to callback for 
 -- showing next frame 
 function m.playFrame()
--- show current frame 
-local currentFrame = m.nextFrame
-m.showFrame(currentFrame)
-
--- make the nextFrame really be the next frame now
-m.nextFrame = m.nextFrame + 1 
-if m.nextFrame > m.frameCnt then m.nextFrame = 1 end 
-
--- set timer for callback to this method on next frame 
-m.tmr:alarm(m.frameDurationMs[currentFrame], tmr.ALARM_SINGLE, function()
-m.playFrame()
-end)
+  -- show current frame 
+  local currentFrame = m.nextFrame
+  m.showFrame(currentFrame)
+  
+  -- make the nextFrame really be the next frame now
+  m.nextFrame = m.nextFrame + 1 
+  if m.nextFrame > m.frameCnt then m.nextFrame = 1 end 
+  
+  -- set timer for callback to this method on next frame 
+  m.tmr:alarm(m.frameDurationMs[currentFrame], tmr.ALARM_SINGLE, function()
+    m.playFrame()
+  end)
 
 end
 
 function m.stop()
-m.tmr:unregister()
-print("Stopped playing Animated GIF. file:", m.filename)
+  m.tmr:unregister()
+  print("Stopped playing Animated GIF. file:", m.filename)
 end
 
 function m.loadFrame(frameNum)
-if file.open(m.filename, "r") then
--- skip the first N bytes of the file
-local bytesToSkip = (frameNum - 1) * m.frameSize
--- print("Will skip bytes:", bytesToSkip)
-file.seek("set", bytesToSkip)
-m.xbmimgstr = file.read(m.frameSize)
-file.close()
--- print("Done reading binary XBM img frame. file:", m.filename)
-else
-print("Could not open file for binary read of XBM img. file:", m.filename)
-end
+  if file.open(m.filename, "r") then
+    -- skip the first N bytes of the file
+    local bytesToSkip = (frameNum - 1) * m.frameSize
+    -- print("Will skip bytes:", bytesToSkip)
+    file.seek("set", bytesToSkip)
+    m.xbmimgstr = file.read(m.frameSize)
+    file.close()
+    -- print("Done reading binary XBM img frame. file:", m.filename)
+  else
+    print("Could not open file for binary read of XBM img. file:", m.filename)
+  end
 end
 
 function m.showFrame(frameNum)
-m.init()
-m.loadFrame(frameNum)
-m.sendImgToDisplay()
+  m.init()
+  m.loadFrame(frameNum)
+  m.sendImgToDisplay()
 end
 
 function m.setupDisplay()
 
--- only setup display if disp not created yet
-if m.disp ~= nil then return end
-
-local id  = i2c.HW0
-local sda = 5 --16
-local scl = 4 --17
-i2c.setup(id, sda, scl, i2c.FAST)
-
-local sla = 0x3c
-m.disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
+  -- only setup display if disp not created yet
+  if m.disp ~= nil then return end
+  
+  local id  = i2c.HW0
+  local sda = 5 --16
+  local scl = 4 --17
+  i2c.setup(id, sda, scl, i2c.FAST)
+  
+  local sla = 0x3c
+  m.disp = u8g2.ssd1306_i2c_128x64_noname(id, sla)
 end
 
 function m.sendImgToDisplay()
-m.disp:clearBuffer()
--- disp:sendBuffer() 
-
--- make sure to set your display width height below
-local x = (128 - m.width) / 2
-local y = (64 - m.height) / 2
-m.disp:drawXBM(x,y,m.width,m.height,m.xbmimgstr)
-m.disp:sendBuffer() 
+  m.disp:clearBuffer()
+  -- disp:sendBuffer() 
+  
+  -- make sure to set your display width height below
+  local x = (128 - m.width) / 2
+  local y = (64 - m.height) / 2
+  m.disp:drawXBM(x,y,m.width,m.height,m.xbmimgstr)
+  m.disp:sendBuffer() 
 end
 
 return m
