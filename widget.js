@@ -552,12 +552,16 @@ end
                   // var durationArr = [];
                   var durationArrStr = "";
                   for (var i = frames.length; i--; ) {
-                    // do minimum 20ms delay because less seems to freeze esp32
                     var delayVal = frames[i].delay;
+                    console.log("delay:", delayVal);
+                    // the delay comes in at 1/100th of a second rather than in ms, so multiply by 10
+                    delayVal = delayVal * 10;
+                    // do minimum 20ms delay because less seems to freeze esp32
                     if (delayVal < 20) delayVal = 20;
                     // durationArr.push(delayVal);
                     durationArrStr += delayVal + ",";
                     if (i % 10 == 0) { durationArrStr += "\n"; }
+                    console.log("tweaked delay:", delayVal);
                   }
                   // var durationArrStr = durationArr.join(",");
                   var tLibEl = $('.widget-xbm-animplaylib');
