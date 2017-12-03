@@ -1895,6 +1895,9 @@ sendImgToDisplay()
                 $('.widget-xbm-img-wht').text(pxWhtCnt);
                 $('.widget-xbm-img-blk').text(pxBlkCnt);
                 
+                // send to lua editor
+                mythat.onCreateScript();
+                
               }, 2000);
               
               // double the height
