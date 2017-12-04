@@ -551,16 +551,16 @@ end
                   // we need a duration array generated 
                   // var durationArr = [];
                   var durationArrStr = "";
-                  for (var i = frames.length; i--; ) {
+                  for (var i = 0; i < frames.length; i++ ) {
                     var delayVal = frames[i].delay;
-                    console.log("delay:", delayVal);
+                    console.log("frame:", i, "delay:", delayVal);
                     // the delay comes in at 1/100th of a second rather than in ms, so multiply by 10
                     delayVal = delayVal * 10;
                     // do minimum 20ms delay because less seems to freeze esp32
                     if (delayVal < 20) delayVal = 20;
                     // durationArr.push(delayVal);
                     durationArrStr += delayVal + ",";
-                    if (i % 10 == 0) { durationArrStr += "\n"; }
+                    if ((i + 1) % 10 == 0) { durationArrStr += "\n"; }
                     console.log("tweaked delay:", delayVal);
                   }
                   // var durationArrStr = durationArr.join(",");
@@ -630,6 +630,9 @@ function m.playFrame()
     m.playFrame()
   end)
 
+  -- load next xbmimgstr so it caches during our tmr delay
+  m.loadFrame(m.nextFrame)
+
 end
 
 function m.stop()
@@ -638,6 +641,15 @@ function m.stop()
 end
 
 function m.loadFrame(frameNum)
+
+  -- see if we have a cached frame
+  if m.currentFrameLoaded == frameNum then
+    -- just use current frame
+    -- print("using cached frame", frameNum)
+    return
+  end
+  
+  -- print("loading frame", frameNum)
   if file.open(m.filename, "r") then
     -- skip the first N bytes of the file
     local bytesToSkip = (frameNum - 1) * m.frameSize
